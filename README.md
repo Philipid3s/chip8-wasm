@@ -1,5 +1,7 @@
 # chip8 emulator writen in C and compiled in a WebAssembly
 
+![Pong](pong-screen.png)
+
 WebAssembly compiled with emscripten (https://github.com/kripken/emscripten)
 
 run build: `npm run build`
