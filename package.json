@@ -1,0 +1,15 @@
+{
+  "name": "chip8-wasm",
+  "version": "1.0.0",
+  "description": "chip8 emulation webassembly",
+  "main": "index.js",
+  "scripts": {
+    "server": "http-server -c-1 -o -a192.168.0.109",
+    "server2": "python -m SimpleHTTPServer",
+    "test": "npm run build-debug && http-server -c-1 -o -a192.168.0.109",
+    "build": "emcc -o chip8.html chip8.c -O3 -s WASM=1 --shell-file html_template/template.html -s ASSERTIONS=1 -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 --embed-file rom/pong.c8 -s EXPORTED_FUNCTIONS=[\"_main\",\"_test_function\"] -s EXTRA_EXPORTED_RUNTIME_METHODS=[\"ccall\"]",
+    "build-debug": "emcc -o chip8.html chip8.c -O1 -s WASM=1 --shell-file html_template/template.html -s ASSERTIONS=1 -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 --embed-file rom/pong.c8 -s EXPORTED_FUNCTIONS=[\"_main\",\"_test_function\"] -s EXTRA_EXPORTED_RUNTIME_METHODS=[\"ccall\"]"
+  },
+  "author": "julien regnault",
+  "license": "ISC"
+}

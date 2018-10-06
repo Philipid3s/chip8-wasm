@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+        
+        .screen {
+            margin: auto;
+            width: 700px;
+            padding: 10px;
+        }
+        
+        img {
+            padding: 10px;
+            margin-left: 200px;
+        }
+
+        .mybutton {
+            visibility: hidden;
+        }
+
+        .link {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div class ="screen">
+        <img src="pong.png">
+        <canvas id="canvas" width="640px", height="320px">
+            Désolé, votre navigateur ne prend pas en charge &lt;canvas&gt;.
+        </canvas>
+    </div>
+    
+    <button class="mybutton">Run test function</button>
+    <p id="result"></p>
+
+    <br>
+    <br>
+    Author: <a class="link" href="mailto:julien.regnault@gmail.com" target="_top">Julien Regnault</a>
+
+    <script>    
+        var Module = {
+            canvas: (function() {
+                var canvas = document.getElementById('canvas');
+                return canvas;
+                })()
+        };
+        
+        document.querySelector('.mybutton').addEventListener('click', function(){
+            var result = Module.ccall('test_function', // name of C function 
+                            'string', // return type
+                            null, // argument types
+                            null); // arguments
+
+            document.getElementById("result").innerText = result;
+        });
+
+    </script>
+
+    {{{ SCRIPT }}}
+</body>
+</html>
