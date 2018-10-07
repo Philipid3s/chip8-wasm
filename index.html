@@ -41,7 +41,8 @@
             Désolé, votre navigateur ne prend pas en charge &lt;canvas&gt;.
         </canvas>
         <br>
-        <p>touch ['] down - touch [\] up... no multiplayer yet</p>
+        <p>Player 1 : [1] up / [4] down</p>
+        <p>Player 2 : [D] up / [C] down</p>
     </div>
     
     <button class="mybutton">Run test function</button>
@@ -63,7 +64,7 @@
         
         document.querySelector('.mybutton').addEventListener('click', function(){
             var result = Module.ccall('test_function', // name of C function 
-                            'string', // return type
+                            null, // return type
                             null, // argument types
                             null); // arguments
 

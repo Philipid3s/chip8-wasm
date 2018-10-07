@@ -46,7 +46,7 @@ void chip8_execute(C8 * CH8){
 
     for(times = 0; times < 10; times++){
         CH8->opcode = CH8->memory[CH8->pc] << 8 | CH8->memory[CH8->pc + 1];
-        printf ("Executing %04X at %04X , I:%02X SP:%02X\n", CH8->opcode, CH8->pc, CH8->I, CH8->sp);
+        // printf ("Executing %04X at %04X , I:%02X SP:%02X\n", CH8->opcode, CH8->pc, CH8->I, CH8->sp);
         switch(CH8->opcode & 0xF000){    
             case 0x0000:
                 switch(CH8->opcode & 0x000F){
@@ -212,7 +212,7 @@ void chip8_execute(C8 * CH8){
                 switch(CH8->opcode & 0x000F){
                     case 0x000E: // EX9E: Skips the next instruction if the key stored in VX is pressed
                         keys = SDL_GetKeyboardState(NULL);
-                        if(keys[keymap[CH8->V[(CH8->opcode & 0x0F00) >> 8]]])
+                        if (keys[scankeymap[CH8->V[(CH8->opcode & 0x0F00) >> 8]]])
                             CH8->pc += 4;
                         else
                             CH8->pc += 2;
@@ -220,7 +220,7 @@ void chip8_execute(C8 * CH8){
 
                     case 0x0001: // EXA1: Skips the next instruction if the key stored in VX isn't pressed
                         keys = SDL_GetKeyboardState(NULL);
-                        if(!keys[keymap[CH8->V[(CH8->opcode & 0x0F00) >> 8]]])
+                        if (!keys[scankeymap[CH8->V[(CH8->opcode & 0x0F00) >> 8]]])    
                             CH8->pc += 4;
                         else
                             CH8->pc += 2;
@@ -239,7 +239,7 @@ void chip8_execute(C8 * CH8){
                     case 0x000A: // FX0A: A key press is awaited, and then stored in VX
                         keys = SDL_GetKeyboardState(NULL);
                         for(i = 0; i < 0x10; i++)
-                            if(keys[keymap[i]]){
+                            if(keys[scankeymap[i]]){
                                 CH8->V[(CH8->opcode & 0x0F00) >> 8] = i;
                                 CH8->pc += 2;
                             }
