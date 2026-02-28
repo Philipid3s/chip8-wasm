@@ -1,6 +1,9 @@
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <SDL2/SDL.h>
 #include <emscripten/emscripten.h>
@@ -19,7 +22,7 @@ SDL_Texture* g_texture = NULL;
 Uint32 *g_pixels;  
 
 // ROM
-const char* g_rom = "../rom/pong.c8";
+const char* g_rom = "rom/pong.c8";
 
 unsigned char chip8_fontset[80] =
 {

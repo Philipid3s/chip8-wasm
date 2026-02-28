@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 
     <style>
@@ -23,6 +22,11 @@
             margin-left: 200px;
         }
 
+        canvas {
+            display: block;
+            border: 1px solid #333;
+        }
+
         .mybutton {
             visibility: hidden;
         }
@@ -37,7 +41,7 @@
 
     <div class ="screen">
         <img src="pong.png">
-        <canvas id="canvas" width="640px", height="320px">
+        <canvas id="canvas" width="640" height="320">
             Désolé, votre navigateur ne prend pas en charge &lt;canvas&gt;.
         </canvas>
         <br>

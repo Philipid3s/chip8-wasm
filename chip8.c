@@ -27,7 +27,8 @@ void chip8_initialize(C8 * CH8){
 
     CH8->pc = 0x200;
     CH8->sp &= 0;
-    CH8->opcode = 0x200;
+    CH8->opcode = 0;
+    srand((unsigned int)time(NULL));
 }
 
 void chip8_timers(C8 * CH8){
@@ -57,8 +58,7 @@ void chip8_execute(C8 * CH8){
                     case 0x000E: // 00EE: Returns from subroutine      
                         CH8->pc = CH8->stack[(--CH8->sp)&0xF] + 2;
                     break;  
-                    default: printf("Wrong opcode: %X\n", CH8->opcode); getchar();
-                }
+                    default: printf("Wrong opcode: %X\n", CH8->opcode);                 }
             break;
 
             case 0x1000: // 1NNN: Jumps to address NNN
@@ -144,13 +144,13 @@ void chip8_execute(C8 * CH8){
                     break;
     
                     case 0x0006: // 8XY6: Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift
-                        CH8->V[0xF] = CH8->V[(CH8->opcode & 0x0F00) >> 8] & 7;
+                        CH8->V[0xF] = CH8->V[(CH8->opcode & 0x0F00) >> 8] & 1;
                         CH8->V[(CH8->opcode & 0x0F00) >> 8] = CH8->V[(CH8->opcode & 0x0F00) >> 8] >> 1;
                         CH8->pc += 2;
                     break;
 
                     case 0x0007: // 8XY7: Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't
-                        if(((int)CH8->V[(CH8->opcode & 0x0F00) >> 8] - (int)CH8->V[(CH8->opcode & 0x00F0) >> 4]) > 0)
+                        if(((int)CH8->V[(CH8->opcode & 0x00F0) >> 4] - (int)CH8->V[(CH8->opcode & 0x0F00) >> 8]) >= 0)
                             CH8->V[0xF] = 1;
                         else
                             CH8->V[0xF] &= 0;
@@ -164,8 +164,7 @@ void chip8_execute(C8 * CH8){
                         CH8->V[(CH8->opcode & 0x0F00) >> 8] = CH8->V[(CH8->opcode & 0x0F00) >> 8] << 1;
                         CH8->pc += 2;
                     break;
-                    default: printf("Wrong opcode: %X\n", CH8->opcode); getchar();
-                }
+                    default: printf("Wrong opcode: %X\n", CH8->opcode);                 }
             break;
 
             case 0x9000: // 9XY0: Skips the next instruction if VX doesn't equal VY
@@ -196,12 +195,15 @@ void chip8_execute(C8 * CH8){
                 CH8->V[0xF] &= 0;
 
                 for(y = 0; y < height; y++){
+                    if(CH8->I + y >= memsize) break;
                     pixel = CH8->memory[CH8->I + y];
                     for(x = 0; x < 8; x++){
                         if(pixel & (0x80 >> x)){
-                            if(CH8->graphics[x+vx+(y+vy)*64])
+                            int px = (vx + x) % 64;
+                            int py = (vy + y) % 32;
+                            if(CH8->graphics[px + py * 64])
                                 CH8->V[0xF] = 1;
-                            CH8->graphics[x+vx+(y+vy)*64] ^= 1;
+                            CH8->graphics[px + py * 64] ^= 1;
                         }
                     }
                 }
@@ -225,8 +227,7 @@ void chip8_execute(C8 * CH8){
                         else
                             CH8->pc += 2;
                     break;
-                    default: printf("Wrong opcode: %X\n", CH8->opcode); getchar();
-                }
+                    default: printf("Wrong opcode: %X\n", CH8->opcode);                 }
             break;
 
             case 0xF000:
@@ -242,6 +243,7 @@ void chip8_execute(C8 * CH8){
                             if(keys[scankeymap[i]]){
                                 CH8->V[(CH8->opcode & 0x0F00) >> 8] = i;
                                 CH8->pc += 2;
+                                break;
                             }
                     break;
 
@@ -266,30 +268,32 @@ void chip8_execute(C8 * CH8){
                     break;
 
                     case 0x0033: // FX33: Stores the Binary-coded decimal representation of VX, with the most significant of three digits at the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2
-                        CH8->memory[CH8->I] = CH8->V[(CH8->opcode & 0x0F00) >> 8] / 100;
-                        CH8->memory[CH8->I+1] = (CH8->V[(CH8->opcode & 0x0F00) >> 8] / 10) % 10;
-                        CH8->memory[CH8->I+2] = CH8->V[(CH8->opcode & 0x0F00) >> 8] % 10;
+                        if(CH8->I + 2 < memsize) {
+                            CH8->memory[CH8->I]   = CH8->V[(CH8->opcode & 0x0F00) >> 8] / 100;
+                            CH8->memory[CH8->I+1] = (CH8->V[(CH8->opcode & 0x0F00) >> 8] / 10) % 10;
+                            CH8->memory[CH8->I+2] = CH8->V[(CH8->opcode & 0x0F00) >> 8] % 10;
+                        }
                         CH8->pc += 2;
                     break;
 
                     case 0x0055: // FX55: Stores V0 to VX in memory starting at address I
                         for(i = 0; i <= ((CH8->opcode & 0x0F00) >> 8); i++)
-                            CH8->memory[CH8->I+i] = CH8->V[i];
+                            if(CH8->I + i < memsize)
+                                CH8->memory[CH8->I+i] = CH8->V[i];
                         CH8->pc += 2;
                     break;
 
                     case 0x0065: //FX65: Fills V0 to VX with values from memory starting at address I
                         for(i = 0; i <= ((CH8->opcode & 0x0F00) >> 8); i++)
-                            CH8->V[i] = CH8->memory[CH8->I + i];
+                            if(CH8->I + i < memsize)
+                                CH8->V[i] = CH8->memory[CH8->I + i];
                         CH8->pc += 2;
                     break;
-                    default: printf("Wrong opcode: %X\n", CH8->opcode); getchar();
-                }
+                    default: printf("Wrong opcode: %X\n", CH8->opcode);                 }
             break;
-            default: printf("Wrong opcode: %X\n", CH8->opcode); getchar();
-        }
-        chip8_timers(CH8);
-    }            
+            default: printf("Wrong opcode: %X\n", CH8->opcode);         }
+    }
+    chip8_timers(CH8);
 }
 
 void chip8_start(){
@@ -317,12 +321,10 @@ void chip8_draw(C8 * CH8){
 void chip8_display(C8* CH8){
     chip8_initialize(&ch8emul);
 
-    SDL_Event event;
-
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    SDL_CreateWindowAndRenderer(SCREEN_W, SCREEN_H, 
-            SDL_WINDOW_RESIZABLE, 
+    SDL_CreateWindowAndRenderer(SCREEN_W, SCREEN_H,
+            0,
             &g_window, &g_renderer);
 
     SDL_SetRenderDrawColor(g_renderer, 0, 0, 0, 255);
