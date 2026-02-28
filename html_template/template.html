@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>CHIP-8 Pong</title>
 
     <style>
         body {
             background-color: black;
             color: white;
+            font-family: monospace;
+            margin: 0;
         }
-        
+
         .screen {
             margin: auto;
-            width: 700px;
-            padding: 10px;
+            width: 642px;
+            padding: 20px 0;
         }
-        
-        img {
-            padding: 10px;
-            margin-left: 200px;
+
+        .screen img {
+            display: block;
+            margin: 0 auto 12px;
         }
 
         canvas {
@@ -27,54 +29,99 @@
             border: 1px solid #333;
         }
 
-        .mybutton {
-            visibility: hidden;
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #aaa;
         }
 
-        .link {
-            color: white;
+        .controls table {
+            border-collapse: collapse;
+        }
+
+        .controls td {
+            padding: 2px 8px 2px 0;
+        }
+
+        kbd {
+            display: inline-block;
+            padding: 1px 6px;
+            border: 1px solid #555;
+            border-radius: 3px;
+            background: #1a1a1a;
+            color: #ddd;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        footer {
+            margin: auto;
+            width: 642px;
+            padding: 12px 0 20px;
+            border-top: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #555;
+        }
+
+        footer a {
+            color: #777;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #aaa;
+        }
+
+        .mybutton {
+            display: none;
         }
     </style>
 </head>
 <body>
-    
 
-    <div class ="screen">
-        <img src="pong.png">
+    <div class="screen">
+        <img src="pong.png" alt="Pong">
         <canvas id="canvas" width="640" height="320">
-            Désolé, votre navigateur ne prend pas en charge &lt;canvas&gt;.
+            Your browser does not support &lt;canvas&gt;.
         </canvas>
-        <br>
-        <p>Player 1 : [1] up / [4] down</p>
-        <p>Player 2 : [D] up / [C] down</p>
+
+        <div class="controls">
+            <table>
+                <tr>
+                    <td>Player 1</td>
+                    <td><kbd>1</kbd> up &nbsp; <kbd>4</kbd> down</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>Player 2</td>
+                    <td><kbd>D</kbd> up &nbsp; <kbd>C</kbd> down</td>
+                </tr>
+            </table>
+        </div>
     </div>
-    
+
+    <footer>
+        <span>Made by <a href="mailto:julien.regnault@gmail.com">Julien Regnault</a></span>
+        <a href="https://github.com/Philipid3s/chip8-wasm" target="_blank">Source on GitHub</a>
+    </footer>
+
     <button class="mybutton">Run test function</button>
     <p id="result"></p>
 
-    <br>
-    <br>
-    Author: <a class="link" href="mailto:julien.regnault@gmail.com" target="_top">Julien Regnault</a>
-    <br>
-    Sources: <a class="link" href="https://github.com/Philipid3s/chip8-wasm" target="_top">Github</a>
-
-    <script>    
+    <script>
         var Module = {
-            canvas: (function() {
-                var canvas = document.getElementById('canvas');
-                return canvas;
-                })()
+            canvas: document.getElementById('canvas')
         };
-        
-        document.querySelector('.mybutton').addEventListener('click', function(){
-            var result = Module.ccall('test_function', // name of C function 
-                            null, // return type
-                            null, // argument types
-                            null); // arguments
 
+        document.querySelector('.mybutton').addEventListener('click', function(){
+            var result = Module.ccall('test_function', null, null, null);
             document.getElementById("result").innerText = result;
         });
-
     </script>
 
     {{{ SCRIPT }}}
